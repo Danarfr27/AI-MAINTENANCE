@@ -826,7 +826,6 @@
       box-shadow: var(--shadow);
       display: none;
     }
-
     .history-dropdown-list .history-item {
       padding: 8px 10px;
       border-radius: 6px;
@@ -835,11 +834,34 @@
       cursor: pointer;
       border: 1px solid transparent;
       margin-bottom: 6px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
     }
 
     .history-dropdown-list .history-item:hover {
       background: var(--bg-card-light);
       transform: translateY(-1px);
+    }
+
+    .history-dropdown-list .role-label {
+      font-weight: 700;
+      font-size: 0.88em;
+      padding: 6px 8px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.03);
+      color: var(--text-secondary);
+      flex-shrink: 0;
+      min-width: 64px;
+      text-align: center;
+    }
+
+    .history-dropdown-list .history-item .snippet {
+      font-size: 0.88em;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">

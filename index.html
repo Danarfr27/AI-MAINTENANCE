@@ -796,6 +796,45 @@
     @media (min-width: 981px) {
       .container { padding-left: 300px; }
     }
+
+    /* History dropdown (top-left) */
+    .history-dropdown {
+      position: fixed;
+      left: 16px;
+      top: 15px;
+      z-index: 1004;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: flex-start;
+    }
+
+    .history-dropdown-list {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px;
+      min-width: 220px;
+      max-height: 60vh;
+      overflow: auto;
+      box-shadow: var(--shadow);
+      display: none;
+    }
+
+    .history-dropdown-list .history-item {
+      padding: 8px 10px;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-primary);
+      cursor: pointer;
+      border: 1px solid transparent;
+      margin-bottom: 6px;
+    }
+
+    .history-dropdown-list .history-item:hover {
+      background: var(--bg-card-light);
+      transform: translateY(-1px);
+    }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
@@ -827,6 +866,11 @@
   </script>
   <!-- Background particles -->
   <div class="particles" id="particles"></div>
+  <!-- Top-left history dropdown -->
+  <div class="history-dropdown" id="historyDropdown">
+    <button id="historyDropdownBtn" class="theme-toggle" aria-expanded="false">Obrolan ▾</button>
+    <div id="historyDropdownList" class="history-dropdown-list" aria-label="Daftar obrolan"></div>
+  </div>
   <!-- Left sidebar: chat history -->
   <div class="sidebar" id="sidebar" aria-label="Chat history">
     <h4>Obrolan Anda</h4>
@@ -1252,32 +1296,67 @@
         const list = document.getElementById('historyList');
         if (!list) return;
         list.innerHTML = '';
+          // populate sidebar list
+          conversationHistory.forEach((msg, idx) => {
+            const text = (msg.parts && msg.parts[0] && msg.parts[0].text) || '';
+            if (isPersonaMessage(text)) return;
 
-        conversationHistory.forEach((msg, idx) => {
-          const text = (msg.parts && msg.parts[0] && msg.parts[0].text) || '';
-          if (isPersonaMessage(text)) return;
+            const item = document.createElement('div');
+            item.className = 'history-item';
+            item.dataset.idx = idx;
 
-          const item = document.createElement('div');
-          item.className = 'history-item';
-          item.dataset.idx = idx;
+            const title = document.createElement('div');
+            title.textContent = msg.role === 'user' ? 'Anda' : 'WormGPT';
+            title.style.fontWeight = '700';
 
-          const title = document.createElement('div');
-          title.textContent = msg.role === 'user' ? 'Anda' : 'WormGPT';
-          title.style.fontWeight = '700';
+            const snippet = document.createElement('span');
+            snippet.className = 'snippet';
+            snippet.textContent = (text || '').replace(/\s+/g,' ').trim().slice(0,80);
 
-          const snippet = document.createElement('span');
-          snippet.className = 'snippet';
-          snippet.textContent = (text || '').replace(/\s+/g,' ').trim().slice(0,80);
+            item.appendChild(title);
+            item.appendChild(snippet);
 
-          item.appendChild(title);
-          item.appendChild(snippet);
+            item.addEventListener('click', () => {
+              try { highlightAndScrollToMessage(idx); } catch(e){}
+            });
 
-          item.addEventListener('click', () => {
-            try { highlightAndScrollToMessage(idx); } catch(e){}
+            list.appendChild(item);
           });
 
-          list.appendChild(item);
-        });
+          // populate top-left dropdown (if present)
+          const dropdown = document.getElementById('historyDropdownList');
+          if (dropdown) {
+            dropdown.innerHTML = '';
+            conversationHistory.forEach((msg, idx) => {
+              const text = (msg.parts && msg.parts[0] && msg.parts[0].text) || '';
+              if (isPersonaMessage(text)) return;
+
+              const item = document.createElement('div');
+              item.className = 'history-item';
+              item.dataset.idx = idx;
+
+              const title = document.createElement('div');
+              title.textContent = msg.role === 'user' ? 'Anda' : 'WormGPT';
+              title.style.fontWeight = '700';
+
+              const snippet = document.createElement('span');
+              snippet.className = 'snippet';
+              snippet.textContent = (text || '').replace(/\s+/g,' ').trim().slice(0,80);
+
+              item.appendChild(title);
+              item.appendChild(snippet);
+
+              item.addEventListener('click', () => {
+                try { highlightAndScrollToMessage(idx); } catch(e){}
+                const listEl = document.getElementById('historyDropdownList');
+                if (listEl) listEl.style.display = 'none';
+                const btn = document.getElementById('historyDropdownBtn');
+                if (btn) btn.setAttribute('aria-expanded','false');
+              });
+
+              dropdown.appendChild(item);
+            });
+          }
       }
 
       function highlightAndScrollToMessage(idx) {
@@ -1335,6 +1414,30 @@
 
       // Initial render of sidebar even if no saved history
       try { renderHistorySidebar(); } catch (e) {}
+
+      // Setup history dropdown toggle behavior (top-left)
+      try {
+        const historyDropdownBtn = document.getElementById('historyDropdownBtn');
+        const historyDropdownList = document.getElementById('historyDropdownList');
+        if (historyDropdownBtn && historyDropdownList) {
+          historyDropdownBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const open = historyDropdownList.style.display === 'block';
+            historyDropdownList.style.display = open ? 'none' : 'block';
+            historyDropdownBtn.setAttribute('aria-expanded', String(!open));
+          });
+
+          // close dropdown when clicking outside
+          document.addEventListener('click', () => {
+            historyDropdownList.style.display = 'none';
+            historyDropdownBtn.setAttribute('aria-expanded', 'false');
+          });
+
+          historyDropdownList.addEventListener('click', (e) => {
+            e.stopPropagation();
+          });
+        }
+      } catch (e) { /* ignore */ }
 
       // Copy to clipboard function
     function copyToClipboard(text, message) {

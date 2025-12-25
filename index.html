@@ -1318,9 +1318,10 @@
 
       // Render sidebar list of messages (simple history view)
       function renderHistorySidebar() {
+        // Try to populate the (now-removed) left sidebar if present
         const list = document.getElementById('historyList');
-        if (!list) return;
-        list.innerHTML = '';
+        if (list) {
+          list.innerHTML = '';
           // populate sidebar list
           conversationHistory.forEach((msg, idx) => {
             const text = (msg.parts && msg.parts[0] && msg.parts[0].text) || '';
@@ -1347,41 +1348,42 @@
 
             list.appendChild(item);
           });
+        }
 
-          // populate top-left dropdown (if present)
-          const dropdown = document.getElementById('historyDropdownList');
-          if (dropdown) {
-            dropdown.innerHTML = '';
-            conversationHistory.forEach((msg, idx) => {
-                const text = (msg.parts && msg.parts[0] && msg.parts[0].text) || '';
-                if (isPersonaMessage(text)) return;
+        // Always populate the top-left dropdown when present
+        const dropdown = document.getElementById('historyDropdownList');
+        if (dropdown) {
+          dropdown.innerHTML = '';
+          conversationHistory.forEach((msg, idx) => {
+            const text = (msg.parts && msg.parts[0] && msg.parts[0].text) || '';
+            if (isPersonaMessage(text)) return;
 
-                const item = document.createElement('div');
-                item.className = 'history-item ' + (msg.role === 'user' ? 'history-item-user' : 'history-item-ai');
-                item.dataset.idx = idx;
+            const item = document.createElement('div');
+            item.className = 'history-item ' + (msg.role === 'user' ? 'history-item-user' : 'history-item-ai');
+            item.dataset.idx = idx;
 
-                const roleLabel = document.createElement('div');
-                roleLabel.className = 'role-label';
-                roleLabel.textContent = msg.role === 'user' ? 'Anda' : 'WormGPT';
+            const roleLabel = document.createElement('div');
+            roleLabel.className = 'role-label';
+            roleLabel.textContent = msg.role === 'user' ? 'Anda' : 'WormGPT';
 
-                const snippet = document.createElement('span');
-                snippet.className = 'snippet';
-                snippet.textContent = (text || '').replace(/\s+/g,' ').trim().slice(0,80);
+            const snippet = document.createElement('span');
+            snippet.className = 'snippet';
+            snippet.textContent = (text || '').replace(/\s+/g,' ').trim().slice(0,80);
 
-                item.appendChild(roleLabel);
-                item.appendChild(snippet);
+            item.appendChild(roleLabel);
+            item.appendChild(snippet);
 
-                item.addEventListener('click', () => {
-                  try { highlightAndScrollToMessage(idx); } catch(e){}
-                  const listEl = document.getElementById('historyDropdownList');
-                  if (listEl) listEl.style.display = 'none';
-                  const btn = document.getElementById('historyDropdownBtn');
-                  if (btn) btn.setAttribute('aria-expanded','false');
-                });
+            item.addEventListener('click', () => {
+              try { highlightAndScrollToMessage(idx); } catch(e){}
+              const listEl = document.getElementById('historyDropdownList');
+              if (listEl) listEl.style.display = 'none';
+              const btn = document.getElementById('historyDropdownBtn');
+              if (btn) btn.setAttribute('aria-expanded','false');
+            });
 
-                dropdown.appendChild(item);
-              });
-          }
+            dropdown.appendChild(item);
+          });
+        }
       }
 
       function highlightAndScrollToMessage(idx) {

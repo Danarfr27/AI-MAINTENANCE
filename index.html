@@ -680,6 +680,13 @@
         gap: 12px;
         border-radius: 10px;
       }
+
+      .chat-container {
+        width: calc(100% - 24px);
+        max-width: 100%;
+        margin: 0 auto;
+        height: calc(100vh - 140px);
+      }
       
       .message-bubble {
         max-width: 92%;
@@ -1346,34 +1353,34 @@
           if (dropdown) {
             dropdown.innerHTML = '';
             conversationHistory.forEach((msg, idx) => {
-              const text = (msg.parts && msg.parts[0] && msg.parts[0].text) || '';
-              if (isPersonaMessage(text)) return;
+                const text = (msg.parts && msg.parts[0] && msg.parts[0].text) || '';
+                if (isPersonaMessage(text)) return;
 
-              const item = document.createElement('div');
-              item.className = 'history-item';
-              item.dataset.idx = idx;
+                const item = document.createElement('div');
+                item.className = 'history-item ' + (msg.role === 'user' ? 'history-item-user' : 'history-item-ai');
+                item.dataset.idx = idx;
 
-              const title = document.createElement('div');
-              title.textContent = msg.role === 'user' ? 'Anda' : 'WormGPT';
-              title.style.fontWeight = '700';
+                const roleLabel = document.createElement('div');
+                roleLabel.className = 'role-label';
+                roleLabel.textContent = msg.role === 'user' ? 'Anda' : 'WormGPT';
 
-              const snippet = document.createElement('span');
-              snippet.className = 'snippet';
-              snippet.textContent = (text || '').replace(/\s+/g,' ').trim().slice(0,80);
+                const snippet = document.createElement('span');
+                snippet.className = 'snippet';
+                snippet.textContent = (text || '').replace(/\s+/g,' ').trim().slice(0,80);
 
-              item.appendChild(title);
-              item.appendChild(snippet);
+                item.appendChild(roleLabel);
+                item.appendChild(snippet);
 
-              item.addEventListener('click', () => {
-                try { highlightAndScrollToMessage(idx); } catch(e){}
-                const listEl = document.getElementById('historyDropdownList');
-                if (listEl) listEl.style.display = 'none';
-                const btn = document.getElementById('historyDropdownBtn');
-                if (btn) btn.setAttribute('aria-expanded','false');
+                item.addEventListener('click', () => {
+                  try { highlightAndScrollToMessage(idx); } catch(e){}
+                  const listEl = document.getElementById('historyDropdownList');
+                  if (listEl) listEl.style.display = 'none';
+                  const btn = document.getElementById('historyDropdownBtn');
+                  if (btn) btn.setAttribute('aria-expanded','false');
+                });
+
+                dropdown.appendChild(item);
               });
-
-              dropdown.appendChild(item);
-            });
           }
       }
 

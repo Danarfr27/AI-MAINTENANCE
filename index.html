@@ -785,58 +785,9 @@
       /* Slightly smaller icons for mobile */
       .top-controls svg { width: 14px; height: 14px; }
     }
-    /* Left sidebar (chat history) */
-    .sidebar {
-      position: fixed;
-      left: 20px;
-      top: 100px;
-      width: 260px;
-      height: calc(100vh - 160px);
-      background: rgba(20,10,10,0.94);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 12px;
-      overflow-y: auto;
-      z-index: 1001;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
-      backdrop-filter: blur(8px);
-    }
-
-    .sidebar h4 { margin-bottom: 8px; font-size: 0.95em; color: var(--text-secondary); }
-
-    .history-list { display:flex; flex-direction:column; gap:8px; }
-    .history-item {
-      padding: 8px 10px;
-      border-radius: 8px;
-      background: transparent;
-      color: var(--text-primary);
-      cursor: pointer;
-      font-size: 0.9em;
-      border: 1px solid transparent;
-    }
-    .history-item:hover { background: var(--bg-card-light); transform: translateY(-1px); }
-    .history-item .snippet { color: var(--text-secondary); font-size: 0.85em; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .history-item.active { border-color: rgba(215,255,17,0.12); box-shadow: 0 6px 18px rgba(0,0,0,0.25); }
-
-    /* Bottom-left logout button */
-    .left-logout {
-      position: fixed;
-      left: 16px;
-      bottom: 16px;
-      z-index: 1003;
-      padding: 10px 12px;
-      border-radius: 10px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      color: var(--text-primary);
-      cursor: pointer;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(8px);
-      font-weight: 600;
-    }
+    /* Sidebar and left-logout removed for a cleaner centered layout */
 
     @media (max-width: 980px) {
-      .sidebar { display: none; }
       .container { padding-left: 0; }
       .history-dropdown { left: 12px; top: 12px; }
     }
@@ -849,9 +800,7 @@
       .message-bubble::before, .message-bubble::after { display: none; }
       .history-dropdown { left: 8px; top: 8px; }
     }
-    @media (min-width: 981px) {
-      .container { padding-left: 300px; }
-    }
+    /* container remains centered on wide screens */
 
     /* History dropdown (top-left) */
     .history-dropdown {
@@ -926,15 +875,6 @@
   <div class="history-dropdown" id="historyDropdown">
     <button id="historyDropdownBtn" class="theme-toggle" aria-expanded="false">Obrolan ▾</button>
     <div id="historyDropdownList" class="history-dropdown-list" aria-label="Daftar obrolan"></div>
-  </div>
-  <!-- Left sidebar: chat history -->
-  <div class="sidebar" id="sidebar" aria-label="Chat history">
-    <h4>Obrolan Anda</h4>
-    <div style="display:flex;gap:8px;margin-bottom:8px;">
-      <button id="newChatBtn" class="theme-toggle" style="padding:6px 8px;font-size:0.85em;">+ Baru</button>
-      <button id="saveChatBtn" class="theme-toggle" style="padding:6px 8px;font-size:0.85em;">Simpan</button>
-    </div>
-    <div class="history-list" id="historyList"></div>
   </div>
 
   
@@ -1039,7 +979,6 @@
   </div>
   
   <!-- Notification -->
-  <button id="leftLogoutBtn" class="left-logout" title="Logout">Logout</button>
   <div class="notification" id="notification">Text copied successfully!</div>
 
   <script>
@@ -1454,19 +1393,7 @@
         });
       }
 
-      // Left-bottom logout duplicates top-right logout behavior
-      const leftLogoutBtn = document.getElementById('leftLogoutBtn');
-      if (leftLogoutBtn) {
-        leftLogoutBtn.addEventListener('click', async () => {
-          try {
-            if (window.auth && typeof auth.logout === 'function') {
-              await auth.logout();
-            }
-          } catch (e) { /* ignore */ }
-          try { localStorage.removeItem(historyKeyFor(currentUsername)); } catch(e){}
-          window.location.href = '/login.html';
-        });
-      }
+      // Left-bottom logout removed; top-right logout button is used instead
 
       // Initial render of sidebar even if no saved history
       try { renderHistorySidebar(); } catch (e) {}

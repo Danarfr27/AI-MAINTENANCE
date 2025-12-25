@@ -63,9 +63,17 @@ export default async function handler(req, res) {
         break;
       } else {
         // Gemini / Google Generative Images via model endpoint
-        // Try model-based endpoint first: /v1beta/models/{model}:generateImage
-        const model = (req.body && req.body.model) ? req.body.model : GEMINI_IMAGE_MODEL;
-        const url = `https://generativelanguage.googleapis.com/v1beta/images:generate?key=${key}`;
+        // Prefer model-specific endpoint when a model is provided: /v1beta/models/{model}:generateImage
+        const model = (req.body && req.body.model) ? String(req.body.model).trim() : GEMINI_IMAGE_MODEL;
+
+        // Construct model path: allow either 'models/NAME' or plain 'NAME'
+        let modelPath = model;
+        if (!modelPath.startsWith('models/')) {
+          modelPath = `models/${modelPath}`;
+        }
+
+        // Use the model-specific generateImage endpoint (recommended)
+        const url = `https://generativelanguage.googleapis.com/v1beta/${modelPath}:generateImage?key=${key}`;
 
         // Gemini expects a prompt object and image config; we provide size as-is
         const body = {
@@ -80,7 +88,7 @@ export default async function handler(req, res) {
         });
 
         if (r.ok) {
-          // Typical Gemini image response may include `images` or `data` or `imageUri`
+          // Typical Gemini image response may include `images`, `data`, `imageUri` or `artifacts`
           finalData = await r.json();
           success = true;
           break;
@@ -91,8 +99,7 @@ export default async function handler(req, res) {
           const txt404 = await r.text().catch(() => '');
           let detail = {};
           try { detail = txt404 ? JSON.parse(txt404) : {}; } catch(e) { detail = { text: txt404 }; }
-          // Add a helpful hint for common misconfigurations
-          detail.hint = detail.hint || `Verify model name ('${GEMINI_IMAGE_MODEL}'), enable Generative AI API, and ensure the key has Image generation permission.`;
+          detail.hint = detail.hint || `Verify model name ('${GEMINI_IMAGE_MODEL}' or provided '${model}'), enable Generative AI API, and ensure the key has Image generation permission.`;
           lastError = { status: r.status, statusText: r.statusText, provider: 'gemini', attempt: i, details: detail };
           break;
         }

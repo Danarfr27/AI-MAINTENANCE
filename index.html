@@ -222,7 +222,8 @@
       box-shadow: var(--shadow);
       backdrop-filter: blur(12px);
       transition: all 0.25s ease;
-      max-width: 820px;
+      width: min(96%, 1200px);
+      max-width: 1200px;
       margin: 0 auto;
     }
     
@@ -313,11 +314,11 @@
     }
     
     .ai-message .message-bubble {
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border: 1px solid var(--border-color);
+      background: #000;
+      border: 1px solid rgba(255,255,255,0.03);
       border-bottom-left-radius: 8px;
       border-top-left-radius: 12px;
-      color: var(--text-primary);
+      color: #fff;
     }
 
     /* simple avatar dots using pseudo-elements */

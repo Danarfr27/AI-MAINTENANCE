@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login - WORM AI</title>
+  <style>
+    body { font-family: Inter, system-ui, Arial; display:flex; align-items:center; justify-content:center; min-height:100vh; background:#0a0a0a; color:#fff; }
+    .card { width:360px; padding:24px; background:rgba(20,20,20,0.95); border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.6); }
+    h1{ font-size:20px; margin-bottom:8px }
+    label{ display:block; font-size:13px; margin-top:12px; color:#bdbdbd }
+    input{ width:100%; padding:10px 12px; margin-top:6px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background:transparent; color:#fff }
+    button{ margin-top:18px; width:100%; padding:10px; border-radius:10px; background:linear-gradient(90deg,#0ce804,#0814ff); color:#000; font-weight:700; border:none; cursor:pointer }
+    .notice{ font-size:13px; color:#9aa0a6; margin-top:12px }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Masuk</h1>
+    <div class="notice">Gunakan akun user atau admin untuk mengakses aplikasi.</div>
+    <label for="username">Username</label>
+    <input id="username" autocomplete="username" />
+    <label for="password">Password</label>
+    <input id="password" type="password" autocomplete="current-password" />
+    <button id="loginBtn">Masuk</button>
+    <div class="notice" id="msg"></div>
+    <hr style="opacity:0.06;margin-top:16px" />
+    <div style="font-size:13px;color:#9aa0a6;margin-top:8px">
+      Peringatan!!: <strong>Jika Belum Mempunyai Akun, Silakan Hubungi Admin</strong>
+    </div>
+  </div>
+
+  <script src="/js/auth.js"></script>
+  <script>
+    const msg = document.getElementById('msg');
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+      msg.textContent = '';
+      const u = document.getElementById('username').value.trim();
+      const p = document.getElementById('password').value;
+      const result = await auth.login(u, p);
+      if (result && result.ok) {
+        window.location.href = '/index.html';
+      } else {
+        msg.textContent = result && result.message ? result.message : 'Username atau password salah.';
+      }
+    });
+    document.addEventListener('keypress', (e)=>{ if(e.key==='Enter') document.getElementById('loginBtn').click(); });
+  </script>
+</body>
+</html>

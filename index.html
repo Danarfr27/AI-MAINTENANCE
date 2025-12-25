@@ -676,7 +676,7 @@
       }
       
       .chat-log {
-        padding: 12px;
+        padding: 12px 12px 140px 12px; /* leave extra space for fixed input on mobile */
         gap: 12px;
         border-radius: 10px;
       }
@@ -695,7 +695,7 @@
       }
       
       .input-area {
-        padding: 12px;
+        padding: 10px 12px;
         gap: 10px;
         position: fixed;
         left: 0;
@@ -704,18 +704,26 @@
         margin: 0 12px 12px 12px;
         border-radius: 12px;
         max-width: calc(100% - 24px);
+        display: flex;
+        align-items: center; /* center textarea and button vertically */
       }
       
       .chat-input {
         padding: 12px 15px;
         font-size: 0.95em;
         min-height: 45px;
+        max-height: 120px;
+        overflow-y: auto;
+        flex: 1; /* take remaining width */
+        margin: 0; /* remove extra margins that could misalign */
       }
       
       .send-btn {
-        width: 45px;
-        height: 45px;
-        padding: 12px;
+        width: 46px;
+        height: 46px;
+        padding: 8px;
+        flex-shrink: 0;
+        align-self: center; /* ensure vertical centering */
       }
       
       .send-btn svg {
